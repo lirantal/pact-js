@@ -13,7 +13,6 @@ const Matchers = require('./dsl/matchers')
 const Verifier = require('./dsl/verifier')
 const MockService = require('./dsl/mockService')
 const Interaction = require('./dsl/interaction')
-const serviceFactory = require('@pact-foundation/pact-node')
 const clc = require('cli-color')
 const path = require('path')
 
@@ -53,20 +52,28 @@ module.exports = (opts) => {
   const logLevel = opts.logLevel || 'INFO'
   const spec = opts.spec || 2
   const cors = opts.cors || false
-  const server = serviceFactory.createServer({
-    port: port,
-    log: log,
-    dir: dir,
-    spec: spec,
-    ssl: ssl,
-    sslcert: sslcert,
-    sslkey: sslkey,
-    cors: cors
-  })
-  serviceFactory.logLevel(logLevel)
+  const web = opts.web || false
+  let server = null
+
+  // If we are in Web environment (e.g. Karma, Protractor), don't include pact-node
+  // and create a server
+  if (!web) {
+    const serviceFactory = require('@pact-foundation/pact-node')
+    server = serviceFactory.createServer({
+      port: port,
+      log: log,
+      dir: dir,
+      spec: spec,
+      ssl: ssl,
+      sslcert: sslcert,
+      sslkey: sslkey,
+      cors: cors
+    })
+  } else {
+    server = require('./dsl/mockPactNode')
+  }
 
   logger.info(`Setting up Pact with Consumer "${consumer}" and Provider "${provider}" using mock service on Port: "${port}"`)
-
   const mockService = new MockService(consumer, provider, port, host, ssl)
 
   /** @namespace PactProvider */
