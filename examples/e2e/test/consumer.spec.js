@@ -56,7 +56,7 @@ describe('Pact', () => {
   const animalBodyExpectation = {
     'id': like(1),
     'first_name': like('Billy'),
-    'last_name': like('Goat'),
+    // 'last_name': like('Goat'),
     'animal': like('goat'),
     'age': like(21),
     'gender': term({
@@ -66,7 +66,7 @@ describe('Pact', () => {
     'location': {
       'description': like('Melbourne Zoo'),
       'country': like('Australia'),
-      'post_code': like(3000)
+      // 'post_code': like(3000)
     },
     'eligibility': {
       'available': like(true),
